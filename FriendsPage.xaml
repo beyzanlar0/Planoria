@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Planoria.FriendsPage"
+             BackgroundColor="#FDF0F2">
+
+    <ScrollView>
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Padding="24,40,24,20" RowSpacing="4">
+
+            <!-- Başlık -->
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <Label Text="arkadaşlar" FontSize="32" FontAttributes="Bold" 
+                       TextColor="#D4A5B5" Margin="2,2,0,0"/>
+                <Label Text="arkadaşlar" FontSize="32" FontAttributes="Bold" 
+                       TextColor="#F4A6C1"/>
+            </Grid>
+
+            <!-- Arama alanı -->
+            <Frame Grid.Row="1" CornerRadius="24" Padding="6" BackgroundColor="White" 
+                   BorderColor="#F4C2D7" HasShadow="True" Margin="0,0,0,14">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Entry Grid.Column="0" x:Name="SearchEntry" 
+                           Placeholder="Kullanıcı adı ara..." 
+                           PlaceholderColor="#C99AAB"
+                           TextColor="#5A3A45"
+                           BackgroundColor="Transparent"
+                           VerticalOptions="Center"
+                           Margin="12,0,0,0"/>
+                    <Button Grid.Column="1" Text="🔍" 
+                            Clicked="OnSearchClicked"
+                            BackgroundColor="#F4A6C1"
+                            TextColor="White"
+                            CornerRadius="20"
+                            WidthRequest="44"
+                            HeightRequest="44"
+                            Padding="0"/>
+                </Grid>
+            </Frame>
+
+            <!-- Arama/Bekleyen istekler sonuçları -->
+            <Label Grid.Row="2" x:Name="PendingRequestsLabel" 
+                   Text="Bekleyen İstekler" FontSize="16" FontAttributes="Bold"
+                   TextColor="#D98BA8" Margin="4,0,0,10" IsVisible="False"/>
+
+            <CollectionView Grid.Row="3" x:Name="ResultsCollectionView" Margin="0,0,0,20">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8" Margin="0,10,0,10">
+                        <Label Text="🐱" FontSize="32" HorizontalOptions="Center"/>
+                        <Label Text="arkadaşlarını bulmak için ara!" 
+                               TextColor="#C99AAB" HorizontalOptions="Center" FontSize="13"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame CornerRadius="18" Padding="14,10" Margin="0,0,0,10" 
+                               BackgroundColor="White" BorderColor="#F4C2D7" HasShadow="False">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Frame Grid.Column="0" CornerRadius="20" WidthRequest="40" HeightRequest="40"
+       Padding="0" BackgroundColor="{Binding AvatarColor}" HasShadow="False" BorderColor="Transparent">
+                                    <Label Text="{Binding AvatarEmoji}" FontSize="16" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Frame>
+                                <Label Grid.Column="1" Text="{Binding Username}" 
+                                       VerticalOptions="Center" FontSize="15"
+                                       TextColor="#5A3A45" Margin="10,0,0,0"/>
+                                <Button Grid.Column="2" Text="{Binding ActionText}" 
+                                        Clicked="OnActionButtonClicked"
+                                        BackgroundColor="#F4A6C1"
+                                        TextColor="White"
+                                        CornerRadius="14"
+                                        FontSize="12"
+                                        HeightRequest="32"
+                                        Padding="12,0"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Arkadaşlarım bölümü -->
+            <Label Grid.Row="4" Text="Arkadaşlarım" FontSize="16" FontAttributes="Bold"
+                   TextColor="#D98BA8" Margin="4,0,0,10"/>
+
+            <CollectionView Grid.Row="5" x:Name="FriendsCollectionView">
+                <CollectionView.EmptyView>
+                    <Label Text="Henüz arkadaşın yok" TextColor="#C99AAB" 
+                           HorizontalOptions="Center" FontSize="13" Margin="0,10,0,10"/>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame CornerRadius="18" Padding="14,10" Margin="0,0,0,10" 
+                               BackgroundColor="White" BorderColor="#F4C2D7" HasShadow="False">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="4">
+                                <Frame Grid.Column="0" CornerRadius="18" WidthRequest="36" HeightRequest="36"
+       Padding="0" BackgroundColor="{Binding AvatarColor}" HasShadow="False" BorderColor="Transparent">
+                                    <Label Text="{Binding AvatarEmoji}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Frame>
+                                <Label Grid.Column="1" Text="{Binding Username}" 
+                                       VerticalOptions="Center" FontSize="14"
+                                       TextColor="#5A3A45" Margin="8,0,0,0"/>
+                                <Button Grid.Column="2" Text="💬" Clicked="OnChatWithFriendClicked"
+                                        BackgroundColor="Transparent" FontSize="16" Padding="4"/>
+                                <Button Grid.Column="3" Text="🚫" Clicked="OnBlockFriendClicked"
+                                        BackgroundColor="Transparent" FontSize="16" Padding="4"/>
+                                <Button Grid.Column="4" Text="🗑️" Clicked="OnRemoveFriendClicked"
+                                        BackgroundColor="Transparent" FontSize="16" Padding="4"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </Grid>
+    </ScrollView>
+
+</ContentPage>

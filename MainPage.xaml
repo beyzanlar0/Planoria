@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Planoria.MainPage"
+             BackgroundColor="#FDF0F2">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="24,40,24,20">
+
+        <!-- Başlık -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Label Text="görevlerim" FontSize="32" FontAttributes="Bold" 
+                   TextColor="#D4A5B5" Margin="2,2,0,0"/>
+            <Label Text="görevlerim" FontSize="32" FontAttributes="Bold" 
+                   TextColor="#F4A6C1"/>
+        </Grid>
+
+        <!-- Görev ekleme alanı -->
+        <Frame Grid.Row="1" CornerRadius="24" Padding="6" BackgroundColor="White" 
+               BorderColor="#F4C2D7" HasShadow="True" Margin="0,0,0,14">
+            <Grid ColumnDefinitions="*,Auto">
+                <Entry Grid.Column="0" x:Name="NewTaskEntry" MaxLength="200"
+                       Placeholder="Yeni görev ekle..." 
+                       PlaceholderColor="#C99AAB"
+                       TextColor="#5A3A45"
+                       BackgroundColor="Transparent"
+                       VerticalOptions="Center"
+                       Margin="12,0,0,0"/>
+                <Button Grid.Column="1" Text="➕" 
+                        Clicked="OnAddTaskClicked"
+                        BackgroundColor="#F4A6C1"
+                        TextColor="White"
+                        CornerRadius="20"
+                        WidthRequest="44"
+                        HeightRequest="44"
+                        Padding="0"/>
+            </Grid>
+        </Frame>
+
+        <!-- Filtre sekmeleri -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,*,*,*" Margin="0,0,0,14">
+            <Button Grid.Column="0" x:Name="DailyTabButton" Text="Günlük" 
+                    Clicked="OnFilterClicked" CommandParameter="Daily"
+                    BackgroundColor="#F4A6C1" TextColor="White" 
+                    CornerRadius="16" FontSize="12" HeightRequest="36" Padding="0"/>
+            <Button Grid.Column="1" x:Name="WeeklyTabButton" Text="Haftalık" 
+                    Clicked="OnFilterClicked" CommandParameter="Weekly"
+                    BackgroundColor="White" TextColor="#D98BA8" 
+                    CornerRadius="16" FontSize="12" HeightRequest="36" Padding="0" Margin="4,0,0,0"/>
+            <Button Grid.Column="2" x:Name="MonthlyTabButton" Text="Aylık" 
+                    Clicked="OnFilterClicked" CommandParameter="Monthly"
+                    BackgroundColor="White" TextColor="#D98BA8" 
+                    CornerRadius="16" FontSize="12" HeightRequest="36" Padding="0" Margin="4,0,0,0"/>
+            <Button Grid.Column="3" x:Name="YearlyTabButton" Text="Yıllık" 
+                    Clicked="OnFilterClicked" CommandParameter="Yearly"
+                    BackgroundColor="White" TextColor="#D98BA8" 
+                    CornerRadius="16" FontSize="12" HeightRequest="36" Padding="0" Margin="4,0,0,0"/>
+        </Grid>
+
+        <!-- Görev listesi -->
+        <RefreshView Grid.Row="3" x:Name="TasksRefreshView" Refreshing="OnRefreshing">
+            <CollectionView x:Name="TasksCollectionView">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                        <Label Text="🐾" FontSize="40" HorizontalOptions="Center"/>
+                        <Label Text="henüz görev yok, ilk görevini ekle!" 
+                               TextColor="#C99AAB" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Frame CornerRadius="18" Padding="14,10" Margin="0,0,0,10" 
+                               BackgroundColor="White" BorderColor="#F4C2D7" HasShadow="False">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <CheckBox Grid.Column="0" IsChecked="{Binding IsCompleted}" 
+                                          Color="#F4A6C1"
+                                          CheckedChanged="OnTaskCheckedChanged"/>
+                                <Label Grid.Column="1" Text="{Binding Title}" 
+                                       VerticalOptions="Center" FontSize="15"
+                                       TextColor="#5A3A45"/>
+                                <Button Grid.Column="2" Text="🗑️" 
+                                        Clicked="OnDeleteTaskClicked"
+                                        BackgroundColor="Transparent"
+                                        FontSize="16"
+                                        Padding="4"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+    </Grid>
+
+</ContentPage>

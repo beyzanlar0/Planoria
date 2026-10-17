@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Planoria.SelectPeoplePage"
+             BackgroundColor="#FDF0F2">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Padding="24,30,24,20">
+
+        <Label Grid.Row="0" x:Name="PageTitleLabel" Text="Kişi Seç"
+               FontSize="24" FontAttributes="Bold" TextColor="#F4A6C1" Margin="0,0,0,16"/>
+
+        <!-- Grup adı (sadece grup oluştururken görünür) -->
+        <Frame Grid.Row="1" x:Name="GroupNameFrame" CornerRadius="20" Padding="14,4"
+               BackgroundColor="White" BorderColor="#F4C2D7" HasShadow="False"
+               Margin="0,0,0,14" IsVisible="False">
+            <Entry x:Name="GroupNameEntry" Placeholder="Grup adı..." MaxLength="100"
+                   PlaceholderColor="#C99AAB" TextColor="#5A3A45" BackgroundColor="Transparent"/>
+        </Frame>
+
+        <!-- Arama -->
+        <Frame Grid.Row="2" CornerRadius="24" Padding="6" BackgroundColor="White"
+               BorderColor="#F4C2D7" HasShadow="True" Margin="0,0,0,14">
+            <Grid ColumnDefinitions="*,Auto">
+                <Entry Grid.Column="0" x:Name="SearchEntry"
+                       Placeholder="Kullanıcı adıyla ara..."
+                       PlaceholderColor="#C99AAB"
+                       TextColor="#5A3A45"
+                       BackgroundColor="Transparent"
+                       VerticalOptions="Center"
+                       Margin="12,0,0,0"
+                       TextChanged="OnSearchTextChanged"/>
+                <Button Grid.Column="1" Text="🔍"
+                        BackgroundColor="#F4A6C1" TextColor="White"
+                        CornerRadius="20" WidthRequest="44" HeightRequest="44" Padding="0"
+                        IsEnabled="False"/>
+            </Grid>
+        </Frame>
+
+        <!-- Kişi listesi -->
+        <CollectionView Grid.Row="3" x:Name="PeopleCollectionView">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame CornerRadius="18" Padding="14,10" Margin="0,0,0,10"
+           BackgroundColor="White" BorderColor="#F4C2D7" HasShadow="False">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnPersonTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8">
+                            <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected}"
+                      IsVisible="{Binding ShowCheckbox}"
+                      Color="#F4A6C1" CheckedChanged="OnPersonCheckedChanged"/>
+                            <Frame Grid.Column="1" CornerRadius="18" WidthRequest="36" HeightRequest="36"
+                   Padding="0" BackgroundColor="{Binding AvatarColor}" HasShadow="False" BorderColor="Transparent">
+                                <Label Text="{Binding AvatarEmoji}" FontSize="16"
+                       HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Frame>
+                            <Label Grid.Column="2" Text="{Binding Username}"
+                   VerticalOptions="Center" FontSize="15" TextColor="#5A3A45"/>
+                            <Label Grid.Column="3" Text="{Binding Tag}"
+                   VerticalOptions="Center" FontSize="11" TextColor="#C99AAB"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Devam et (sadece grup modlarında) -->
+        <Button Grid.Row="4" x:Name="ConfirmButton" Text="Devam Et"
+                Clicked="OnConfirmClicked"
+                BackgroundColor="#D98BA8"
+                TextColor="White"
+                FontAttributes="Bold"
+                CornerRadius="24"
+                HeightRequest="50"
+                Margin="0,14,0,0"/>
+
+    </Grid>
+
+</ContentPage>

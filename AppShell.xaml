@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:local="clr-namespace:Planoria"
+       x:Class="Planoria.AppShell"
+       BackgroundColor="#FDF0F2"
+       Shell.TabBarBackgroundColor="White"
+       Shell.TabBarForegroundColor="#F4A6C1"
+       Shell.TabBarUnselectedColor="#C99AAB">
+
+    <TabBar>
+        <ShellContent Title="🏠 Görevler" ContentTemplate="{DataTemplate local:MainPage}" Route="MainPage"/>
+        <ShellContent Title="👥 Arkadaşlar" ContentTemplate="{DataTemplate local:FriendsPage}" Route="FriendsPage"/>
+        <ShellContent Title="💬 Sohbet" ContentTemplate="{DataTemplate local:ChatPage}" Route="ChatPage"/>
+        <ShellContent Title="👤 Profilim" ContentTemplate="{DataTemplate local:ProfilePage}" Route="ProfilePage"/>
+    </TabBar>
+
+</Shell>

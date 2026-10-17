@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Planoria.ChatPage"
+             BackgroundColor="#FDF0F2">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="24,40,24,20">
+
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Label Text="sohbetler" FontSize="32" FontAttributes="Bold"
+                   TextColor="#D4A5B5" Margin="2,2,0,0"/>
+            <Label Text="sohbetler" FontSize="32" FontAttributes="Bold"
+                   TextColor="#F4A6C1"/>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,0,0,12">
+            <Button Grid.Column="0" Text="💬 Yeni Sohbet"
+                    Clicked="OnNewChatClicked"
+                    BackgroundColor="White" TextColor="#D98BA8"
+                    BorderColor="#F4A6C1" BorderWidth="1.5"
+                    CornerRadius="18" FontSize="13" HeightRequest="42"/>
+            <Button Grid.Column="1" Text="👥 Grup Oluştur"
+                    Clicked="OnCreateGroupClicked"
+                    BackgroundColor="#F4A6C1" TextColor="White"
+                    CornerRadius="18" FontSize="13" HeightRequest="42"/>
+        </Grid>
+
+        <Button Grid.Row="2" x:Name="RequestsButton" Text="📨 İstekler"
+                Clicked="OnRequestsClicked"
+                BackgroundColor="White" TextColor="#D98BA8"
+                BorderColor="#F4C2D7" BorderWidth="1.5"
+                CornerRadius="18" FontSize="13" HeightRequest="42" Margin="0,0,0,16"/>
+
+        <CollectionView Grid.Row="3" x:Name="ChatsCollectionView">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                    <Label Text="💬" FontSize="40" HorizontalOptions="Center"/>
+                    <Label Text="henüz sohbetin/grubun yok" TextColor="#C99AAB" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame CornerRadius="18" Padding="14,10" Margin="0,0,0,10"
+                           BackgroundColor="White" BorderColor="#F4C2D7" HasShadow="False">
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnChatTapped"/>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                            <Frame Grid.Column="0" CornerRadius="22" WidthRequest="44" HeightRequest="44"
+       Padding="0" BackgroundColor="{Binding IconColor}" HasShadow="False" BorderColor="Transparent">
+                                <Label Text="{Binding Icon}" FontSize="18"
+           HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Frame>
+                            <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="1">
+                                <Label Text="{Binding Name}" FontSize="15" FontAttributes="Bold" TextColor="#5A3A45"/>
+                                <Label Text="{Binding Subtitle}" FontSize="12" TextColor="#C99AAB"
+                                       LineBreakMode="TailTruncation" MaxLines="1"/>
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="{Binding TimeText}" FontSize="11"
+                                   TextColor="#C99AAB" VerticalOptions="Start"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</ContentPage>

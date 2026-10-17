@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Planoria.EditProfilePage"
+             BackgroundColor="#FDF0F2"
+             Title="Profili Düzenle">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24,30,24,20" Spacing="16">
+
+            <Grid Margin="0,0,0,10">
+                <Label Text="düzenle" FontSize="28" FontAttributes="Bold"
+                       TextColor="#D4A5B5" Margin="2,2,0,0"/>
+                <Label Text="düzenle" FontSize="28" FontAttributes="Bold"
+                       TextColor="#F4A6C1"/>
+            </Grid>
+
+            <!-- Avatar önizleme ve seçici -->
+            <Frame x:Name="PreviewFrame" CornerRadius="48" WidthRequest="96" HeightRequest="96"
+                   Padding="0" BackgroundColor="#F4A6C1" HasShadow="False"
+                   BorderColor="Transparent" HorizontalOptions="Center">
+                <Label x:Name="PreviewLabel" Text="🐱" FontSize="42"
+                       HorizontalOptions="Center" VerticalOptions="Center"/>
+            </Frame>
+            <Label Text="Bir avatar seç" FontSize="12" TextColor="#C99AAB" HorizontalOptions="Center"/>
+
+            <FlexLayout x:Name="AvatarsLayout" Wrap="Wrap" JustifyContent="Center">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Frame CornerRadius="28" WidthRequest="56" HeightRequest="56" Padding="0" Margin="4"
+                               HasShadow="False" BorderColor="{Binding Border}"
+                               BackgroundColor="{Binding BackColor}" Opacity="{Binding Opacity}">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnAvatarTapped"/>
+                            </Frame.GestureRecognizers>
+                            <Label Text="{Binding Emoji}" FontSize="26"
+                                   HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Frame>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </FlexLayout>
+
+            <Label Text="Kullanıcı adı" FontSize="12" TextColor="#C99AAB" Margin="4,10,0,0"/>
+            <Frame CornerRadius="24" Padding="16,4" BackgroundColor="White"
+                   BorderColor="#F4C2D7" HasShadow="False">
+                <Entry x:Name="UsernameEntry" MaxLength="50" TextColor="#5A3A45" BackgroundColor="Transparent"/>
+            </Frame>
+
+            <Label Text="E-posta" FontSize="12" TextColor="#C99AAB" Margin="4,10,0,0"/>
+            <Frame CornerRadius="24" Padding="16,4" BackgroundColor="White"
+                   BorderColor="#F4C2D7" HasShadow="False">
+                <Entry x:Name="EmailEntry" MaxLength="100" TextColor="#5A3A45" BackgroundColor="Transparent"/>
+            </Frame>
+
+            <Label Text="Mevcut şifre (sadece şifreyi değiştirecekse)" FontSize="12" TextColor="#C99AAB" Margin="4,10,0,0"/>
+            <Frame CornerRadius="24" Padding="16,4" BackgroundColor="White"
+                   BorderColor="#F4C2D7" HasShadow="False">
+                <Entry x:Name="CurrentPasswordEntry" IsPassword="True" TextColor="#5A3A45" BackgroundColor="Transparent"/>
+            </Frame>
+
+            <Label Text="Yeni şifre (değiştirmek istemiyorsan boş bırak)" FontSize="12" TextColor="#C99AAB" Margin="4,10,0,0"/>
+            <Frame CornerRadius="24" Padding="16,4" BackgroundColor="White"
+                   BorderColor="#F4C2D7" HasShadow="False">
+                <Entry x:Name="NewPasswordEntry" IsPassword="True" TextColor="#5A3A45" BackgroundColor="Transparent"/>
+            </Frame>
+
+            <Label x:Name="ErrorLabel" TextColor="#E0607A" IsVisible="False" FontSize="13"
+                   HorizontalOptions="Center" Margin="0,8,0,0"/>
+
+            <Button Text="Kaydet"
+                    Clicked="OnSaveClicked"
+                    BackgroundColor="#D98BA8" TextColor="White"
+                    FontAttributes="Bold" FontSize="16"
+                    CornerRadius="24" HeightRequest="50"
+                    Margin="0,16,0,0"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

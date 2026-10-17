@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Planoria.GroupChatPage"
+             BackgroundColor="#FDF0F2">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <Grid Grid.Row="0" Padding="20,30,20,12" BackgroundColor="White" ColumnDefinitions="*,Auto">
+            <VerticalStackLayout Grid.Column="0" Spacing="0">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnHeaderTapped"/>
+                </VerticalStackLayout.GestureRecognizers>
+                <Label x:Name="GroupNameLabel" Text="Grup" FontSize="20" FontAttributes="Bold" TextColor="#D98BA8"/>
+                <Label x:Name="MemberCountLabel" Text="" FontSize="12" TextColor="#C99AAB"/>
+            </VerticalStackLayout>
+            <Button Grid.Column="1" Text="📋 Görevler" Clicked="OnTasksClicked"
+                    BackgroundColor="#F4A6C1" TextColor="White"
+                    CornerRadius="16" FontSize="12" HeightRequest="36" Padding="14,0"/>
+        </Grid>
+
+        <CollectionView Grid.Row="1" x:Name="MessagesCollectionView"
+                        Margin="14,10,14,0"
+                        ItemTemplate="{StaticResource BubbleSelector}">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="8"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.EmptyView>
+                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="8">
+                    <Label Text="🐱" FontSize="36" HorizontalOptions="Center"/>
+                    <Label Text="ilk mesajı sen yaz!" TextColor="#C99AAB" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+        </CollectionView>
+
+        <Grid Grid.Row="2" Padding="14,8,14,14" ColumnDefinitions="*,Auto" ColumnSpacing="8">
+            <Frame Grid.Column="0" CornerRadius="24" Padding="6" BackgroundColor="White"
+                   BorderColor="#F4C2D7" HasShadow="False">
+                <Entry x:Name="MessageEntry" Placeholder="Mesaj yaz..." MaxLength="2000"
+                       PlaceholderColor="#C99AAB" TextColor="#5A3A45"
+                       BackgroundColor="Transparent" Margin="10,0,0,0"
+                       Completed="OnSendClicked"/>
+            </Frame>
+            <Button Grid.Column="1" Text="➤" Clicked="OnSendClicked"
+                    BackgroundColor="#D98BA8" TextColor="White"
+                    CornerRadius="24" WidthRequest="48" HeightRequest="48" Padding="0"/>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

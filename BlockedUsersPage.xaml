@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Planoria.BlockedUsersPage"
+             BackgroundColor="#FDF0F2"
+             Title="Engellenenler">
+
+    <Grid Padding="24,20,24,20" RowDefinitions="Auto,*">
+        <Label Grid.Row="0" Text="Engellenen Kullanıcılar" FontSize="18" FontAttributes="Bold" TextColor="#D98BA8" Margin="0,0,0,14"/>
+
+        <CollectionView Grid.Row="1" x:Name="BlockedCollectionView">
+            <CollectionView.EmptyView>
+                <Label Text="Engellenen kimse yok" TextColor="#C99AAB" HorizontalOptions="Center" Margin="0,20,0,0"/>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame CornerRadius="18" Padding="14,10" Margin="0,0,0,10" 
+                           BackgroundColor="White" BorderColor="#F4C2D7" HasShadow="False">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="{Binding Username}" VerticalOptions="Center" FontSize="15" TextColor="#5A3A45"/>
+                            <Button Grid.Column="1" Text="Kaldır" Clicked="OnUnblockClicked"
+                                    BackgroundColor="#F4A6C1" TextColor="White" CornerRadius="14" FontSize="12" HeightRequest="32" Padding="12,0"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+
+</ContentPage>

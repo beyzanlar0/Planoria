@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Planoria.MemberProfilePage"
+             BackgroundColor="#FDF0F2"
+             Title="Profil">
+
+    <VerticalStackLayout Padding="24,40,24,20" Spacing="14" HorizontalOptions="Center">
+        <Frame x:Name="AvatarFrame" CornerRadius="48" WidthRequest="96" HeightRequest="96" Padding="0"
+               BackgroundColor="#F4A6C1" HasShadow="False" BorderColor="Transparent"
+               HorizontalOptions="Center">
+            <Label x:Name="AvatarLabel" Text="🐱" FontSize="42"
+                   HorizontalOptions="Center" VerticalOptions="Center"/>
+        </Frame>
+        <Label x:Name="UsernameLabel" Text="..." FontSize="22" FontAttributes="Bold"
+               TextColor="#5A3A45" HorizontalOptions="Center"/>
+        <Label x:Name="JoinedLabel" Text="" FontSize="13" TextColor="#C99AAB" HorizontalOptions="Center"/>
+    </VerticalStackLayout>
+
+</ContentPage>

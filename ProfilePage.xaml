@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Planoria.ProfilePage"
+             BackgroundColor="#FDF0F2">
+
+    <VerticalStackLayout Padding="24,40,24,20" Spacing="20">
+
+        <Grid Margin="0,0,0,10">
+            <Label Text="profilim" FontSize="32" FontAttributes="Bold"
+                   TextColor="#D4A5B5" Margin="2,2,0,0"/>
+            <Label Text="profilim" FontSize="32" FontAttributes="Bold"
+                   TextColor="#F4A6C1"/>
+        </Grid>
+
+        <Frame CornerRadius="20" Padding="16" BackgroundColor="White"
+               BorderColor="#F4C2D7" HasShadow="True">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+
+                <Frame Grid.Column="0" x:Name="AvatarFrame" CornerRadius="32" WidthRequest="64" HeightRequest="64"
+                       Padding="0" BackgroundColor="#F4A6C1" HasShadow="False" BorderColor="Transparent">
+                    <Label x:Name="AvatarLabel" Text="🐱" FontSize="28"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Frame>
+
+                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                    <Label x:Name="UsernameLabel" Text="..." FontSize="17" FontAttributes="Bold" TextColor="#5A3A45"/>
+                    <Label x:Name="EmailLabel" Text="..." FontSize="13" TextColor="#C99AAB"/>
+                </VerticalStackLayout>
+
+                <Button Grid.Column="2" Text="Yönet"
+                        Clicked="OnManageClicked"
+                        BackgroundColor="#F4A6C1" TextColor="White"
+                        CornerRadius="14" FontSize="12" HeightRequest="34"
+                        VerticalOptions="Center" Padding="14,0"/>
+
+            </Grid>
+        </Frame>
+
+        <Button Text="Engellenen Kullanıcılar"
+                Clicked="OnBlockedUsersClicked"
+                BackgroundColor="White" TextColor="#D98BA8"
+                BorderColor="#F4C2D7" BorderWidth="1.5"
+                CornerRadius="20" HeightRequest="48"/>
+
+        <Button Text="Çıkış Yap"
+                Clicked="OnLogoutClicked"
+                BackgroundColor="Transparent" TextColor="#D98BA8"
+                FontAttributes="Bold"
+                BorderColor="#D98BA8" BorderWidth="1.5"
+                CornerRadius="20" HeightRequest="48"
+                Margin="0,10,0,0"/>
+
+    </VerticalStackLayout>
+
+</ContentPage>
