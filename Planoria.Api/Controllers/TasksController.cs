@@ -21,9 +21,14 @@ public class TasksController : ControllerBase
         int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub"), out var id)
             ? id : 0;
 
+    private static DateTime? AsUtc(DateTime? d) =>
+     d.HasValue ? DateTime.SpecifyKind(d.Value, DateTimeKind.Utc) : null;
+
     private static TaskResponse ToResponse(TaskItem t) => new(
         t.Id, t.Title, t.Description, t.RecurrenceType,
-        t.DueDate, t.IsCompleted, t.CompletedAt, t.CreatedAt);
+        t.DueDate, t.IsCompleted,
+        AsUtc(t.CompletedAt),
+        DateTime.SpecifyKind(t.CreatedAt, DateTimeKind.Utc));
 
     // GET api/tasks  -> sadece benim bireysel görevlerim
     [HttpGet]
@@ -72,5 +77,76 @@ public class TasksController : ControllerBase
         await _db.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetById), new { id = task.Id }, ToResponse(task));
+    }
+    // PUT api/tasks/5
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<TaskResponse>> Update(int id, UpdateTaskRequest req)
+    {
+        var title = req.Title.Trim();
+        if (title.Length == 0)
+            return BadRequest(new { error = "Başlık boş olamaz." });
+
+        var userId = CurrentUserId;
+        var task = await _db.Tasks
+            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId && t.GroupId == null);
+        if (task == null) return NotFound();
+
+        task.Title = title;
+        task.Description = string.IsNullOrWhiteSpace(req.Description) ? null : req.Description.Trim();
+        task.RecurrenceType = req.RecurrenceType;
+        task.DueDate = req.DueDate;
+
+        await _db.SaveChangesAsync();
+        return ToResponse(task);
+    }
+
+    // DELETE api/tasks/5
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var userId = CurrentUserId;
+        var task = await _db.Tasks
+            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId && t.GroupId == null);
+        if (task == null) return NotFound();
+
+        _db.Tasks.Remove(task);
+        await _db.SaveChangesAsync();
+        return NoContent();
+    }
+
+    // POST api/tasks/5/complete
+    [HttpPost("{id:int}/complete")]
+    public async Task<ActionResult<TaskResponse>> Complete(int id)
+    {
+        var userId = CurrentUserId;
+        var task = await _db.Tasks
+            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId && t.GroupId == null);
+        if (task == null) return NotFound();
+
+        if (!task.IsCompleted)               // zaten tamamsa tarihi değiştirme
+        {
+            task.IsCompleted = true;
+            task.CompletedAt = DateTime.UtcNow;   // zamanı sunucu verir
+            await _db.SaveChangesAsync();
+        }
+        return ToResponse(task);
+    }
+
+    // POST api/tasks/5/reopen
+    [HttpPost("{id:int}/reopen")]
+    public async Task<ActionResult<TaskResponse>> Reopen(int id)
+    {
+        var userId = CurrentUserId;
+        var task = await _db.Tasks
+            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId && t.GroupId == null);
+        if (task == null) return NotFound();
+
+        if (task.IsCompleted)
+        {
+            task.IsCompleted = false;
+            task.CompletedAt = null;
+            await _db.SaveChangesAsync();
+        }
+        return ToResponse(task);
     }
 }

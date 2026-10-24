@@ -16,6 +16,18 @@ public class CreateTaskRequest
 
     public DateTime DueDate { get; set; }
 }
+public class UpdateTaskRequest
+{
+    [Required, MaxLength(200)]
+    public string Title { get; set; } = "";
+
+    [MaxLength(1000)]
+    public string? Description { get; set; }
+
+    public RecurrenceType RecurrenceType { get; set; }
+
+    public DateTime DueDate { get; set; }
+}
 
 // İstemciye döneceğimiz alanlar
 public record TaskResponse(
