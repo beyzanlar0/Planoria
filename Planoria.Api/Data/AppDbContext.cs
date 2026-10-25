@@ -12,9 +12,7 @@ namespace Planoria.Data
     
     public class AppDbContext : DbContext
     {
-        public AppDbContext()
-        {
-        }
+  
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
@@ -74,15 +72,7 @@ namespace Planoria.Data
             modelBuilder.Entity<GroupMember>().HasIndex(gm => new { gm.GroupId, gm.UserId }).IsUnique();
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer(DbSecrets.ConnectionString);
-            }
-
-
-        }
+       
     }
 }
 

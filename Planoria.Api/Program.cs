@@ -15,8 +15,11 @@ var jwtKey = builder.Configuration["Jwt:Key"]
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+var connectionString = builder.Configuration.GetConnectionString("Default")
+    ?? throw new InvalidOperationException("ConnectionStrings:Default bulunamadı. appsettings.json dosyasını kontrol et.");
+
 builder.Services.AddDbContext<AppDbContext>(o =>
-    o.UseSqlServer(DbSecrets.ConnectionString));
+    o.UseSqlServer(connectionString));
 
 // 2) Gelen kartı (JWT) nasıl kontrol edeceğimizi tanımla
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -64,8 +67,7 @@ app.UseAuthentication();   // "sen kimsin?"
 app.UseAuthorization();    // "buraya girebilir misin?"
 app.MapControllers();
 
-app.MapGet("/health", async (AppDbContext db) =>
-    new { users = await db.Users.CountAsync() });
+app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
 // 5) Kart zorunlu: kimlik sunucuda karttan okunuyor
 app.MapGet("/me", (ClaimsPrincipal user) => new
@@ -75,3 +77,4 @@ app.MapGet("/me", (ClaimsPrincipal user) => new
 }).RequireAuthorization();
 
 app.Run();
+public partial class Program { }
