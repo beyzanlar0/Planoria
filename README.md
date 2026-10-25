@@ -1,38 +1,127 @@
 # Planoria
 
-Arkadaşlarla ve gruplarla birlikte plan yapmaya odaklanan bir ajanda uygulaması.
-.NET MAUI ile yazıldı, verileri SQL Server'da tutar.
+A collaborative planner with tasks, friends, groups and chat.
+Built to practice a real-world architecture: a **.NET MAUI** client talking to an **ASP.NET Core Web API** secured with **JWT**, backed by **SQL Server**.
 
-## Özellikler
-- Kayıt ve giriş (şifreler BCrypt ile hash'lenir)
-- Günlük, haftalık, aylık ve yıllık görevler
-- Arkadaşlık sistemi: arama, istek, kabul, engelleme
-- Birebir sohbet; arkadaş olmayanlar için mesaj isteği
-- Grup sohbeti, grup davetleri, yönetici / yardımcı yönetici / üye rolleri
-- Lider onaylı, süreli grup görevleri (geri sayım sayacı, görevi tek kişi üstlenir)
-- Emoji avatar seçimi
+> **Status:** work in progress. The API (auth + tasks) is complete and tested; the MAUI app is being migrated from direct database access to the API. See [Known limitations](#known-limitations).
 
-## Teknolojiler
-.NET 9, .NET MAUI (XAML), Entity Framework Core 9 (Code First), SQL Server, BCrypt.Net-Next
+## Tech stack
 
-## Kurulum
-1. SQL Server Express'i kur ve TCP/IP'yi etkinleştir.
-2. `Data/DbSecrets.example.txt` dosyasını aynı klasörde `DbSecrets.cs` adıyla kopyala,
-   gerekirse sunucu adını kendi bilgisayarına göre değiştir.
-3. Package Manager Console'da `Update-Database` komutunu çalıştır.
-4. Windows hedefiyle çalıştır.
+- .NET 9, C#
+- ASP.NET Core Web API, JWT bearer authentication, rate limiting
+- Entity Framework Core 9 (Code First, migrations), SQL Server
+- .NET MAUI (Windows) for the client
+- BCrypt for password hashing
+- xUnit + `WebApplicationFactory` for integration tests
 
-## Bilinen sınırlamalar
-- Şu an yalnızca Windows hedefi test edildi; Android derlemesi henüz çözülmedi.
-- Uygulama veritabanına doğrudan bağlanıyor, yetki kontrolleri uygulama içinde yapılıyor.
-  Bunlar sunucu tarafına taşınmalı.
-- Oturum bilgisi yerel depolamada tutuluyor (JWT yok).
-- Mesajlar anlık değil, sayfa yenilenince güncelleniyor.
-- Giriş denemesi sınırı yok.
+## Features
 
-## Yol haritası
-- ASP.NET Core Web API + JWT ile istemci-sunucu mimarisine geçiş
-- SignalR ile anlık mesajlaşma ve okunmamış mesaj sayacı
-- Lider değerlendirme (yıldız puanı) ve yüksek puanlı liderlere "Danışmanlık Al" akışı
-- E-posta doğrulama
-- Android desteği
+**API (current branch `api-gecisi`)**
+- Register / login with JWT
+- Personal tasks: list, get, create, update, delete, complete, reopen
+- Per-user ownership checks on every task endpoint
+- Login/register rate limiting (10 requests per minute per IP)
+
+**MAUI app (still connects to the database directly, being migrated)**
+- Tasks with due dates and recurrence
+- Friends, friend requests and blocking
+- Group chats, direct messages, group tasks and invitations
+- Profile with avatars
+
+## Getting started (API)
+
+**Requirements**
+- [.NET 9 SDK](https://dotnet.microsoft.com/download)
+- SQL Server Express (default instance name `.\SQLEXPRESS`, Windows authentication)
+
+**1. Clone and switch to the API branch**
+
+```powershell
+git clone https://github.com/beyzanlar0/Planoria.git
+cd Planoria
+git checkout api-gecisi
+```
+
+**2. Set the JWT signing key** (stored in user-secrets, never committed)
+
+```powershell
+$b = New-Object byte[] 48
+[Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b)
+dotnet user-secrets set "Jwt:Key" ([Convert]::ToBase64String($b)) --project Planoria.Api | Out-Null
+```
+
+**3. Run the API**
+
+```powershell
+dotnet run --project Planoria.Api\Planoria.Api.csproj --launch-profile http
+```
+
+In the `Development` environment the API creates the `PlanoriaDb` database and applies migrations automatically on startup. By default it listens on `http://localhost:5225` (see `Planoria.Api/Properties/launchSettings.json`).
+
+Using a different SQL Server? Override the connection string without touching the repo:
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:Default" "<your connection string>" --project Planoria.Api
+```
+
+**4. Try it**
+
+```powershell
+$base = "http://localhost:5225"  
+$body = @{ username = "demo"; email = "demo@example.com"; password = "Demo12345678!" } | ConvertTo-Json
+$r = Invoke-RestMethod -Method Post "$base/api/auth/register" -ContentType "application/json" -Body $body
+Invoke-RestMethod "$base/api/tasks" -Headers @{ Authorization = "Bearer $($r.token)" }
+```
+
+## API overview
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| POST | `/api/auth/register` | no | Create an account, returns a JWT |
+| POST | `/api/auth/login` | no | Log in, returns a JWT |
+| GET | `/health` | no | Liveness check |
+| GET | `/me` | yes | Current user from the token |
+| GET | `/api/tasks` | yes | List my personal tasks |
+| GET | `/api/tasks/{id}` | yes | Get one of my tasks |
+| POST | `/api/tasks` | yes | Create a task |
+| PUT | `/api/tasks/{id}` | yes | Update a task |
+| DELETE | `/api/tasks/{id}` | yes | Delete a task |
+| POST | `/api/tasks/{id}/complete` | yes | Mark as completed (idempotent) |
+| POST | `/api/tasks/{id}/reopen` | yes | Undo completion |
+
+
+## Tests
+
+```powershell
+dotnet test Planoria.Api.Tests
+```
+
+Integration tests start the API in memory with an in-memory database (no SQL Server needed). They verify, among other things, that a user **cannot read, update, delete or complete another user's task** (404) and that requests without a token get 401.
+
+## Security notes
+
+- **Passwords** are hashed with BCrypt, never stored in plain text.
+- **JWT** is validated for issuer, audience, lifetime and signature. The signing key lives in user-secrets.
+- **Ownership:** the user id always comes from the token, never from the request. Every query filters by it, and other users' resources return **404** so their existence is not revealed.
+- **DTOs** are used instead of exposing entities, which prevents mass assignment.
+- **Login errors** use one generic message to avoid revealing which accounts exist.
+- **Rate limiting** on auth endpoints (10 requests/minute per IP, HTTP 429).
+- **No secrets in the repository.** The default connection string uses Windows authentication; `TrustServerCertificate=true` is for local development only.
+- Server-generated timestamps (`CreatedAt`, `CompletedAt`) are stored and returned in UTC.
+
+## Known limitations
+
+- The MAUI app still talks to the database directly, so role rules there are enforced only in the UI. Moving it to the API is the next milestone.
+- Friends, groups and chat endpoints are not in the API yet.
+- No refresh tokens (access tokens last 60 minutes) and no e-mail verification.
+- Only the Windows target of the MAUI app currently builds; the Android build fails with an `Aapt2Link` error.
+- Data is not real-time; screens refresh on navigation.
+
+## Roadmap
+
+- [ ] Friends, groups and chat endpoints
+- [ ] Switch the MAUI app to the API
+- [ ] Task filtering, sorting and search
+- [ ] Refresh tokens and e-mail verification
+- [ ] CI pipeline running the tests
+- [ ] Android build fix
