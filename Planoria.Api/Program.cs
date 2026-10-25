@@ -59,6 +59,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    // Sadece geliştirmede: veritabanı yoksa oluştur, eksik migration varsa uygula
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    if (db.Database.IsRelational())   // testlerdeki bellek içi veritabanını atla
+        db.Database.Migrate();
 }
 
 app.UseHttpsRedirection();
