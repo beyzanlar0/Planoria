@@ -131,4 +131,18 @@
 	  </MauiXaml>
 	</ItemGroup>
 
+<ItemGroup>
+  <Compile Remove="Planoria.Api\**" />
+  <EmbeddedResource Remove="Planoria.Api\**" />
+  <None Remove="Planoria.Api\**" />
+  <Content Remove="Planoria.Api\**" />
+  <MauiXaml Remove="Planoria.Api\**" />
+
+	<Compile Remove="Planoria.Api.Tests\**" />
+	<EmbeddedResource Remove="Planoria.Api.Tests\**" />
+	<None Remove="Planoria.Api.Tests\**" />
+	<Content Remove="Planoria.Api.Tests\**" />
+	<MauiXaml Remove="Planoria.Api.Tests\**" />
+</ItemGroup>
+
 </Project>

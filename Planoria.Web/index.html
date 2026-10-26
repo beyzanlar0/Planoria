@@ -1,0 +1,99 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Planoria</title>
+    <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+    <section id="login-view" class="auth">
+        <div class="auth-card">
+            <div class="brand brand-large"><span class="brand-mark">P</span> Planoria</div>
+            <p class="muted">Plan your days, weeks and months.</p>
+            <form id="login-form" class="stack">
+                <label for="usernameOrEmail">Username or email</label>
+                <input id="usernameOrEmail" name="usernameOrEmail" autocomplete="username" required maxlength="100">
+
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="100">
+
+                <button type="submit">Sign in</button>
+                <p id="login-error" class="error" role="alert"></p>
+            </form>
+            <form id="register-form" class="stack" hidden>
+                <label for="reg-username">Username</label>
+                <input id="reg-username" name="username" autocomplete="username" required maxlength="50">
+
+                <label for="reg-email">Email</label>
+                <input id="reg-email" name="email" type="email" autocomplete="email" required maxlength="100">
+
+                <label for="reg-password">Password</label>
+                <input id="reg-password" name="password" type="password" autocomplete="new-password" required minlength="8" maxlength="72">
+                <p class="hint">At least 8 characters.</p>
+
+                <button type="submit">Create account</button>
+                <p id="register-error" class="error" role="alert"></p>
+            </form>
+
+            <p class="auth-switch">
+                <span id="switch-text">New here?</span>
+                <button id="switch-btn" type="button" class="link">Create an account</button>
+            </p>
+        </div>
+    </section>
+
+    <div id="app-view" hidden>
+        <header class="topbar">
+            <div class="topbar-inner">
+                <div class="brand"><span class="brand-mark">P</span> Planoria</div>
+                <nav class="tabs" aria-label="Task views">
+                    <a href="#today" data-view="today">Today</a>
+                    <a href="#week" data-view="week">This week</a>
+                    <a href="#month" data-view="month">This month</a>
+                    <a href="#all" data-view="all">All</a>
+                </nav>
+                <button id="logout-btn" type="button" class="ghost">Sign out</button>
+            </div>
+        </header>
+
+        <main class="page">
+            <div class="page-head">
+                <div>
+                    <h1 id="view-title">Today</h1>
+                    <p id="view-subtitle" class="muted"></p>
+                </div>
+                <button id="new-task-btn" type="button">+ New task</button>
+            </div>
+
+            <form id="task-form" class="panel" hidden>
+                <div class="field">
+                    <label for="task-title">Title</label>
+                    <input id="task-title" name="title" required maxlength="200" placeholder="What needs to be done?">
+                </div>
+                <div class="field">
+                    <label for="task-due">Due date</label>
+                    <input id="task-due" name="dueDate" type="date" required>
+                </div>
+                <button type="submit">Add task</button>
+                <p id="task-error" class="error" role="alert"></p>
+            </form>
+
+            <p id="tasks-message" class="muted"></p>
+            <ul id="task-list" class="task-list"></ul>
+        </main>
+    </div>
+    <dialog id="confirm-dialog" class="dialog">
+        <form method="dialog">
+            <h2>Delete task?</h2>
+            <p id="confirm-text" class="muted"></p>
+            <div class="dialog-actions">
+                <button value="cancel" class="secondary">Cancel</button>
+                <button value="confirm" class="danger">Delete</button>
+            </div>
+        </form>
+    </dialog>
+    <footer class="footer"><span id="status">Checking API...</span></footer>
+    <script src="app.js?v=3"></script>
+</body>
+</html>
