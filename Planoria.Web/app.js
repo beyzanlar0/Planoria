@@ -1,31 +1,131 @@
 ﻿const API_URL = "http://localhost:5225";
 
-const statusEl = document.getElementById("status");
-const loginView = document.getElementById("login-view");
-const tasksView = document.getElementById("tasks-view");
-const loginForm = document.getElementById("login-form");
-const loginError = document.getElementById("login-error");
-const logoutBtn = document.getElementById("logout-btn");
-const taskList = document.getElementById("task-list");
-const tasksMessage = document.getElementById("tasks-message");
-const taskForm = document.getElementById("task-form");
-const taskError = document.getElementById("task-error");
+const $ = (id) => document.getElementById(id);
+const statusEl = $("status");
+const loginView = $("login-view");
+const appView = $("app-view");
+const loginForm = $("login-form");
+const loginError = $("login-error");
+const logoutBtn = $("logout-btn");
+const newTaskBtn = $("new-task-btn");
+const taskForm = $("task-form");
+const taskTitleInput = $("task-title");
+const taskDueInput = $("task-due");
+const taskError = $("task-error");
+const viewTitle = $("view-title");
+const viewSubtitle = $("view-subtitle");
+const tasksMessage = $("tasks-message");
+const taskList = $("task-list");
+const confirmDialog = $("confirm-dialog");
+const confirmText = $("confirm-text");
+
+let allTasks = [];
+
+/* ---------- Date helpers ---------- */
+function startOfDay(date) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+}
+
+function addDays(date, days) {
+    const d = new Date(date);
+    d.setDate(d.getDate() + days);
+    return d;
+}
+
+function startOfWeek(date) {
+    const d = startOfDay(date);
+    const daysSinceMonday = (d.getDay() + 6) % 7;
+    return addDays(d, -daysSinceMonday);
+}
+
+function toInputDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+}
+
+function formatDate(date) {
+    return date.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" });
+}
+
+/* ---------- Views (Today / Week / Month / All) ---------- */
+const VIEWS = {
+    today: {
+        title: "Today",
+        empty: "Nothing due today.",
+        range: () => {
+            const start = startOfDay(new Date());
+            return [start, addDays(start, 1)];
+        }
+    },
+    week: {
+        title: "This week",
+        empty: "Nothing due this week.",
+        range: () => {
+            const start = startOfWeek(new Date());
+            return [start, addDays(start, 7)];
+        }
+    },
+    month: {
+        title: "This month",
+        empty: "Nothing due this month.",
+        range: () => {
+            const now = new Date();
+            return [new Date(now.getFullYear(), now.getMonth(), 1), new Date(now.getFullYear(), now.getMonth() + 1, 1)];
+        }
+    },
+    all: {
+        title: "All tasks",
+        empty: "No tasks yet. Add your first one!",
+        range: null
+    }
+};
+
+function currentView() {
+    const name = location.hash.replace("#", "");
+    return VIEWS[name] ? name : "today";
+}
+
+function tasksForView(name) {
+    const config = VIEWS[name];
+    let tasks = allTasks;
+
+    if (config.range) {
+        const [start, end] = config.range();
+        const todayStart = startOfDay(new Date());
+        tasks = allTasks.filter((t) => {
+            const due = new Date(t.dueDate);
+            const inRange = due >= start && due < end;
+            const overdue = !t.isCompleted && due < todayStart;
+            return inRange || overdue;
+        });
+    }
+
+    return [...tasks].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+}
+
+/* ---------- Auth state ---------- */
 function getToken() {
     return sessionStorage.getItem("token");
 }
 
-function showView() {
+function showScreen() {
     const loggedIn = Boolean(getToken());
     loginView.hidden = loggedIn;
-    tasksView.hidden = !loggedIn;
+    appView.hidden = !loggedIn;
     if (loggedIn) loadTasks();
 }
 
 function logout() {
     sessionStorage.removeItem("token");
-    showView();
+    allTasks = [];
+    showScreen();
 }
 
+/* ---------- API calls ---------- */
 async function checkApi() {
     try {
         const response = await fetch(`${API_URL}/health`);
@@ -38,8 +138,7 @@ async function checkApi() {
 }
 
 async function loadTasks() {
-    tasksMessage.textContent = "Loading...";
-    taskList.replaceChildren();
+    if (allTasks.length === 0) tasksMessage.textContent = "Loading...";
 
     try {
         const response = await fetch(`${API_URL}/api/tasks`, {
@@ -51,8 +150,8 @@ async function loadTasks() {
         }
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-        const tasks = await response.json();
-        renderTasks(tasks);
+        allTasks = await response.json();
+        render();
     } catch (err) {
         tasksMessage.textContent = "Could not load tasks.";
     }
@@ -80,55 +179,84 @@ async function callTaskApi(path, method) {
     }
 }
 
-function renderTasks(tasks) {
-    taskList.replaceChildren();
-    tasksMessage.textContent = tasks.length === 0 ? "No tasks yet." : "";
+/* ---------- Delete confirmation dialog ---------- */
+function confirmDelete(taskTitle) {
+    confirmText.textContent = `"${taskTitle}" will be permanently deleted.`;
+    confirmDialog.returnValue = "";
 
-    for (const task of tasks) {
-        const li = document.createElement("li");
-        li.className = task.isCompleted ? "task done" : "task";
-
-        const info = document.createElement("div");
-        info.className = "task-info";
-
-        const title = document.createElement("span");
-        title.className = "task-title";
-        title.textContent = task.title;
-
-        const due = document.createElement("span");
-        due.className = "task-due";
-        due.textContent = new Date(task.dueDate).toLocaleDateString("en-GB");
-
-        info.append(title, due);
-
-        const actions = document.createElement("div");
-        actions.className = "task-actions";
-
-        const toggleBtn = document.createElement("button");
-        toggleBtn.type = "button";
-        toggleBtn.className = "secondary";
-        toggleBtn.textContent = task.isCompleted ? "Reopen" : "Done";
-        toggleBtn.addEventListener("click", () => {
-            const action = task.isCompleted ? "reopen" : "complete";
-            callTaskApi(`${task.id}/${action}`, "POST");
-        });
-
-        const deleteBtn = document.createElement("button");
-        deleteBtn.type = "button";
-        deleteBtn.className = "danger";
-        deleteBtn.textContent = "Delete";
-        deleteBtn.addEventListener("click", () => {
-            if (confirm("Delete this task?")) {
-                callTaskApi(`${task.id}`, "DELETE");
-            }
-        });
-
-        actions.append(toggleBtn, deleteBtn);
-        li.append(info, actions);
-        taskList.append(li);
-    }
+    return new Promise((resolve) => {
+        confirmDialog.addEventListener(
+            "close",
+            () => resolve(confirmDialog.returnValue === "confirm"),
+            { once: true }
+        );
+        confirmDialog.showModal();
+    });
 }
 
+/* ---------- Rendering ---------- */
+function createTaskCard(task) {
+    const due = new Date(task.dueDate);
+    const overdue = !task.isCompleted && due < startOfDay(new Date());
+
+    const li = document.createElement("li");
+    li.className = "task" + (task.isCompleted ? " done" : "") + (overdue ? " overdue" : "");
+
+    const check = document.createElement("button");
+    check.type = "button";
+    check.className = "check";
+    check.textContent = task.isCompleted ? "\u2713" : "";
+    check.setAttribute("aria-label", task.isCompleted ? "Reopen task" : "Mark task as done");
+    check.addEventListener("click", () => {
+        callTaskApi(`${task.id}/${task.isCompleted ? "reopen" : "complete"}`, "POST");
+    });
+
+    const info = document.createElement("div");
+    info.className = "task-info";
+
+    const title = document.createElement("span");
+    title.className = "task-title";
+    title.textContent = task.title;
+
+    const dueText = document.createElement("span");
+    dueText.className = "task-due";
+    dueText.textContent = overdue ? `${formatDate(due)} \u00b7 Overdue` : formatDate(due);
+
+    info.append(title, dueText);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.className = "text-danger";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", async () => {
+        if (await confirmDelete(task.title)) {
+            callTaskApi(`${task.id}`, "DELETE");
+        }
+    });
+
+    li.append(check, info, deleteBtn);
+    return li;
+}
+
+function render() {
+    const name = currentView();
+    const config = VIEWS[name];
+    const tasks = tasksForView(name);
+
+    for (const link of document.querySelectorAll(".tabs a")) {
+        if (link.dataset.view === name) link.setAttribute("aria-current", "page");
+        else link.removeAttribute("aria-current");
+    }
+
+    const done = tasks.filter((t) => t.isCompleted).length;
+    viewTitle.textContent = config.title;
+    viewSubtitle.textContent = `${tasks.length - done} open \u00b7 ${done} done`;
+    tasksMessage.textContent = tasks.length === 0 ? config.empty : "";
+
+    taskList.replaceChildren(...tasks.map(createTaskCard));
+}
+
+/* ---------- Events ---------- */
 loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     loginError.textContent = "";
@@ -157,26 +285,43 @@ loginForm.addEventListener("submit", async (event) => {
         const data = await response.json();
         sessionStorage.setItem("token", data.token);
         loginForm.reset();
-        showView();
+        showScreen();
     } catch (err) {
         loginError.textContent = "Cannot reach the server.";
     }
 });
+
+newTaskBtn.addEventListener("click", () => {
+    taskForm.hidden = !taskForm.hidden;
+    if (!taskForm.hidden) {
+        const today = toInputDate(new Date());
+        taskDueInput.min = today;
+        taskDueInput.value = today;
+        taskTitleInput.focus();
+    }
+});
+
 taskForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     taskError.textContent = "";
 
-    const body = {
-        title: taskForm.title.value.trim(),
-        description: null,
-        recurrenceType: 0,
-        dueDate: new Date(taskForm.dueDate.value).toISOString()
-    };
-
-    if (!body.title) {
+    const title = taskTitleInput.value.trim();
+    if (!title) {
         taskError.textContent = "Title is required.";
         return;
     }
+
+    if (taskDueInput.value < toInputDate(new Date())) {
+        taskError.textContent = "Due date cannot be in the past.";
+        return;
+    }
+
+    const body = {
+        title,
+        description: null,
+        recurrenceType: 0,
+        dueDate: new Date(taskDueInput.value).toISOString()
+    };
 
     try {
         const response = await fetch(`${API_URL}/api/tasks`, {
@@ -198,12 +343,18 @@ taskForm.addEventListener("submit", async (event) => {
         }
 
         taskForm.reset();
+        taskForm.hidden = true;
         loadTasks();
     } catch (err) {
         taskError.textContent = "Cannot reach the server.";
     }
 });
+
 logoutBtn.addEventListener("click", logout);
 
+window.addEventListener("hashchange", () => {
+    if (getToken()) render();
+});
+
 checkApi();
-showView();
+showScreen();
