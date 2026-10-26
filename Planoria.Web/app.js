@@ -58,6 +58,28 @@ async function loadTasks() {
     }
 }
 
+async function callTaskApi(path, method) {
+    try {
+        const response = await fetch(`${API_URL}/api/tasks/${path}`, {
+            method,
+            headers: { Authorization: `Bearer ${getToken()}` }
+        });
+
+        if (response.status === 401) {
+            logout();
+            return;
+        }
+        if (!response.ok) {
+            tasksMessage.textContent = "Action failed.";
+            return;
+        }
+
+        loadTasks();
+    } catch (err) {
+        tasksMessage.textContent = "Cannot reach the server.";
+    }
+}
+
 function renderTasks(tasks) {
     taskList.replaceChildren();
     tasksMessage.textContent = tasks.length === 0 ? "No tasks yet." : "";
@@ -65,6 +87,9 @@ function renderTasks(tasks) {
     for (const task of tasks) {
         const li = document.createElement("li");
         li.className = task.isCompleted ? "task done" : "task";
+
+        const info = document.createElement("div");
+        info.className = "task-info";
 
         const title = document.createElement("span");
         title.className = "task-title";
@@ -74,7 +99,32 @@ function renderTasks(tasks) {
         due.className = "task-due";
         due.textContent = new Date(task.dueDate).toLocaleDateString("en-GB");
 
-        li.append(title, due);
+        info.append(title, due);
+
+        const actions = document.createElement("div");
+        actions.className = "task-actions";
+
+        const toggleBtn = document.createElement("button");
+        toggleBtn.type = "button";
+        toggleBtn.className = "secondary";
+        toggleBtn.textContent = task.isCompleted ? "Reopen" : "Done";
+        toggleBtn.addEventListener("click", () => {
+            const action = task.isCompleted ? "reopen" : "complete";
+            callTaskApi(`${task.id}/${action}`, "POST");
+        });
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "danger";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click", () => {
+            if (confirm("Delete this task?")) {
+                callTaskApi(`${task.id}`, "DELETE");
+            }
+        });
+
+        actions.append(toggleBtn, deleteBtn);
+        li.append(info, actions);
         taskList.append(li);
     }
 }
