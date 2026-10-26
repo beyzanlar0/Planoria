@@ -39,6 +39,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddAuthorization();
+builder.Services.AddCors(o => o.AddPolicy("web-dev", p => p
+ .WithOrigins("http://localhost:5500", "http://127.0.0.1:5500")
+    .WithHeaders("Content-Type", "Authorization")
+    .WithMethods("GET", "POST", "PUT", "DELETE")));
 
 // 3) Giriş ve kayıt denemelerini IP başına dakikada 10 ile sınırla
 builder.Services.AddRateLimiter(o =>
@@ -68,6 +72,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment())
+    app.UseCors("web-dev");
 app.UseRateLimiter();
 app.UseAuthentication();   // "sen kimsin?"
 app.UseAuthorization();    // "buraya girebilir misin?"
