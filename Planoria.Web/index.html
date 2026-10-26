@@ -4,12 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Planoria</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+    <link rel="stylesheet" href="style.css?v=2"></head>
 <body>
     <main class="container">
         <h1>Planoria</h1>
         <p id="status">Checking API...</p>
+
+        <section id="login-view">
+            <h2>Sign in</h2>
+            <form id="login-form">
+                <label for="usernameOrEmail">Username or email</label>
+                <input id="usernameOrEmail" name="usernameOrEmail" autocomplete="username" required maxlength="100">
+
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="100">
+
+                <button type="submit">Sign in</button>
+                <p id="login-error" class="error" role="alert"></p>
+            </form>
+        </section>
+
+        <section id="tasks-view" hidden>
+            <div class="header-row">
+                <h2>My tasks</h2>
+                <button id="logout-btn" type="button">Sign out</button>
+            </div>
+            <p id="tasks-message" class="muted"></p>
+            <ul id="task-list" class="task-list"></ul>
+        </section>
     </main>
     <script src="app.js"></script>
 </body>
