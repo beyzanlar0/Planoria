@@ -29,6 +29,16 @@
                 <h2>My tasks</h2>
                 <button id="logout-btn" type="button">Sign out</button>
             </div>
+            <form id="task-form">
+                <label for="task-title">New task</label>
+                <input id="task-title" name="title" required maxlength="200">
+
+                <label for="task-due">Due date</label>
+                <input id="task-due" name="dueDate" type="date" required>
+
+                <button type="submit">Add task</button>
+                <p id="task-error" class="error" role="alert"></p>
+            </form>
             <p id="tasks-message" class="muted"></p>
             <ul id="task-list" class="task-list"></ul>
         </section>

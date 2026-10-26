@@ -8,7 +8,8 @@ const loginError = document.getElementById("login-error");
 const logoutBtn = document.getElementById("logout-btn");
 const taskList = document.getElementById("task-list");
 const tasksMessage = document.getElementById("tasks-message");
-
+const taskForm = document.getElementById("task-form");
+const taskError = document.getElementById("task-error");
 function getToken() {
     return sessionStorage.getItem("token");
 }
@@ -111,7 +112,47 @@ loginForm.addEventListener("submit", async (event) => {
         loginError.textContent = "Cannot reach the server.";
     }
 });
+taskForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    taskError.textContent = "";
 
+    const body = {
+        title: taskForm.title.value.trim(),
+        description: null,
+        recurrenceType: 0,
+        dueDate: new Date(taskForm.dueDate.value).toISOString()
+    };
+
+    if (!body.title) {
+        taskError.textContent = "Title is required.";
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/tasks`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${getToken()}`
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (response.status === 401) {
+            logout();
+            return;
+        }
+        if (!response.ok) {
+            taskError.textContent = "Could not add the task.";
+            return;
+        }
+
+        taskForm.reset();
+        loadTasks();
+    } catch (err) {
+        taskError.textContent = "Cannot reach the server.";
+    }
+});
 logoutBtn.addEventListener("click", logout);
 
 checkApi();
