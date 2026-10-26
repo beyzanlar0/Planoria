@@ -402,3 +402,37 @@ button.danger {
     button.danger:hover {
         background: #b91c1c;
     }
+@media (max-width: 640px) {
+    .tabs {
+        order: 3;
+        flex-basis: 100%;
+    }
+}
+.error:empty {
+    display: none;
+}
+.hint {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.auth-switch {
+    margin: 16px 0 0;
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+}
+
+button.link {
+    background: none;
+    color: var(--primary);
+    padding: 0;
+    font-weight: 600;
+}
+
+    button.link:hover {
+        background: none;
+        color: var(--primary-dark);
+        text-decoration: underline;
+    }

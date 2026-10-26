@@ -18,6 +18,10 @@ const tasksMessage = $("tasks-message");
 const taskList = $("task-list");
 const confirmDialog = $("confirm-dialog");
 const confirmText = $("confirm-text");
+const registerForm = $("register-form");
+const registerError = $("register-error");
+const switchBtn = $("switch-btn");
+const switchText = $("switch-text");
 
 let allTasks = [];
 
@@ -257,6 +261,55 @@ function render() {
 }
 
 /* ---------- Events ---------- */
+function setAuthMode(mode) {
+    const isRegister = mode === "register";
+    loginForm.hidden = isRegister;
+    registerForm.hidden = !isRegister;
+    loginError.textContent = "";
+    registerError.textContent = "";
+    switchText.textContent = isRegister ? "Already have an account?" : "New here?";
+    switchBtn.textContent = isRegister ? "Sign in" : "Create an account";
+}
+
+switchBtn.addEventListener("click", () => {
+    setAuthMode(registerForm.hidden ? "register" : "login");
+});
+
+registerForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    registerError.textContent = "";
+
+    const body = {
+        username: $("reg-username").value.trim(),
+        email: $("reg-email").value.trim(),
+        password: $("reg-password").value
+    };
+
+    try {
+        const response = await fetch(`${API_URL}/api/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
+
+        if (response.status === 429) {
+            registerError.textContent = "Too many attempts. Please wait a minute.";
+            return;
+        }
+        if (!response.ok) {
+            registerError.textContent = "Could not create the account. Check your details; the username or email may already be taken.";
+            return;
+        }
+
+        const data = await response.json();
+        sessionStorage.setItem("token", data.token);
+        registerForm.reset();
+        setAuthMode("login");
+        showScreen();
+    } catch (err) {
+        registerError.textContent = "Cannot reach the server.";
+    }
+});
 loginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     loginError.textContent = "";

@@ -3,7 +3,7 @@
 A collaborative planner with tasks, friends, groups and chat.
 Built to practice a real-world architecture: a **.NET MAUI** client talking to an **ASP.NET Core Web API** secured with **JWT**, backed by **SQL Server**.
 
-> **Status:** work in progress. The API (auth + tasks) is complete and tested; the MAUI app is being migrated from direct database access to the API. See [Known limitations](#known-limitations).
+> **Status:** work in progress. The API (auth + tasks) is complete and tested, and a small web client uses it; the MAUI app is being migrated from direct database access to the API. See [Known limitations](#known-limitations).
 
 ## Tech stack
 
@@ -13,6 +13,7 @@ Built to practice a real-world architecture: a **.NET MAUI** client talking to a
 - .NET MAUI (Windows) for the client
 - BCrypt for password hashing
 - xUnit + `WebApplicationFactory` for integration tests
+- **Web client:** HTML, CSS and vanilla JavaScript (no framework)
 
 ## Features
 
@@ -21,6 +22,12 @@ Built to practice a real-world architecture: a **.NET MAUI** client talking to a
 - Personal tasks: list, get, create, update, delete, complete, reopen
 - Per-user ownership checks on every task endpoint
 - Login/register rate limiting (10 requests per minute per IP)
+
+**Web client (`Planoria.Web`)**
+- Create an account and sign in from the browser
+- Today / This week / This month / All views
+- Create tasks (past dates blocked), complete, reopen and delete with a confirmation dialog
+- Responsive layout (desktop and mobile)
 
 **MAUI app (still connects to the database directly, being migrated)**
 - Tasks with due dates and recurrence
@@ -67,10 +74,14 @@ dotnet user-secrets set "ConnectionStrings:Default" "<your connection string>" -
 **4. Try it**
 
 ```powershell
-$base = "http://localhost:5225"  
+$base = "http://localhost:5225"
 $body = @{ username = "demo"; email = "demo@example.com"; password = "Demo12345678!" } | ConvertTo-Json
 $r = Invoke-RestMethod -Method Post "$base/api/auth/register" -ContentType "application/json" -Body $body
 Invoke-RestMethod "$base/api/tasks" -Headers @{ Authorization = "Bearer $($r.token)" }
+
+# Later, log in with the same account
+$login = @{ usernameOrEmail = "demo"; password = "Demo12345678!" } | ConvertTo-Json
+$r = Invoke-RestMethod -Method Post "$base/api/auth/login" -ContentType "application/json" -Body $login
 ```
 
 ## API overview
@@ -89,6 +100,34 @@ Invoke-RestMethod "$base/api/tasks" -Headers @{ Authorization = "Bearer $($r.tok
 | POST | `/api/tasks/{id}/complete` | yes | Mark as completed (idempotent) |
 | POST | `/api/tasks/{id}/reopen` | yes | Undo completion |
 
+## Web client
+
+A small browser client built with plain HTML, CSS and JavaScript. It signs in through the API and lets you list, add, complete, reopen and delete your own tasks, grouped by day, week and month.
+
+![Tasks on desktop](docs/web-tasks.png)
+
+<p>
+  <img src="docs/web-login.png" alt="Sign in" width="320">
+  <img src="docs/web-register.png" alt="Create account" width="220">
+  <img src="docs/web-mobile.png" alt="Responsive layout on mobile" width="220">
+  <img src="docs/web-delete-dialog.png" alt="Delete confirmation dialog" width="220">
+</p>
+
+Run it (the API must be running on `http://localhost:5225`):
+
+```powershell
+dotnet tool install --global dotnet-serve   # once
+cd Planoria.Web
+dotnet serve -p 5500
+```
+
+Then open `http://localhost:5500`.
+
+Notes:
+- The API allows CORS only for `http://localhost:5500`, and only in the Development environment.
+- The JWT is kept in `sessionStorage` and is cleared when the tab is closed.
+- User-provided text is rendered with `textContent`, never `innerHTML`, to avoid XSS.
+- Ownership is enforced by the API; the browser never decides who owns a task.
 
 ## Tests
 
@@ -116,10 +155,17 @@ Integration tests start the API in memory with an in-memory database (no SQL Ser
 - No refresh tokens (access tokens last 60 minutes) and no e-mail verification.
 - Only the Windows target of the MAUI app currently builds; the Android build fails with an `Aapt2Link` error.
 - Data is not real-time; screens refresh on navigation.
+- The web client currently supports tasks only (no friends, groups or chat yet).
+- Due dates in the past are blocked in the web form, but not yet in the API.
 
 ## Roadmap
 
+- [x] Web client (login, task views, create/complete/delete)
+- [x] Web client: registration page
+- [ ] API: reject past due dates
 - [ ] Friends, groups and chat endpoints
+- [ ] Unread message counters
+- [ ] Real-time messaging with SignalR
 - [ ] Switch the MAUI app to the API
 - [ ] Task filtering, sorting and search
 - [ ] Refresh tokens and e-mail verification
