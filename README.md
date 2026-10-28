@@ -17,7 +17,7 @@ Built to practice a real-world architecture: a **.NET MAUI** client talking to a
 
 ## Features
 
-**API (current branch `api-gecisi`)**
+**API**
 - Register / login with JWT
 - Personal tasks: list, get, create, update, delete, complete, reopen
 - Per-user ownership checks on every task endpoint
@@ -37,16 +37,17 @@ Built to practice a real-world architecture: a **.NET MAUI** client talking to a
 
 ## Getting started (API)
 
+> **Note:** The .NET MAUI client needs a local `DbSecrets` file with a connection string that is not included in this repository, so `dotnet build` at the repository root fails without it. To try the project, run the API and its tests only, as described below.
+
 **Requirements**
 - [.NET 9 SDK](https://dotnet.microsoft.com/download)
 - SQL Server Express (default instance name `.\SQLEXPRESS`, Windows authentication)
 
-**1. Clone and switch to the API branch**
+**1. Clone the repository**
 
 ```powershell
 git clone https://github.com/beyzanlar0/Planoria.git
 cd Planoria
-git checkout api-gecisi
 ```
 
 **2. Set the JWT signing key** (stored in user-secrets, never committed)
