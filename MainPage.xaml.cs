@@ -17,6 +17,9 @@ namespace Planoria
             _context = new AppDbContext();
             _tasks = new ObservableCollection<TaskItem>();
             TasksCollectionView.ItemsSource = _tasks;
+
+            DueDatePicker.MinimumDate = DateTime.Today;   // geçmiş tarih seçilemesin
+            DueDatePicker.Date = DateTime.Today;
         }
 
         protected override async void OnAppearing()
@@ -53,7 +56,7 @@ namespace Planoria
                 Title = title,
                 UserId = userId,
                 RecurrenceType = _currentFilter,
-                DueDate = DateTime.Now,
+                DueDate = DueDatePicker.Date,
                 IsCompleted = false
             };
 
@@ -62,6 +65,7 @@ namespace Planoria
 
             _tasks.Add(newTask);
             NewTaskEntry.Text = string.Empty;
+            DueDatePicker.Date = DateTime.Today;
         }
 
         private async void OnFilterClicked(object sender, EventArgs e)
