@@ -218,6 +218,7 @@ namespace Planoria
             {
                 int targetGroupId = _groupId;
                 string? groupName = null;
+
                 if (_mode == SelectPeopleMode.AddToGroup)
                 {
                     var myRole = await GroupAuth.GetRoleAsync(context, _groupId, _currentUserId);
@@ -226,9 +227,17 @@ namespace Planoria
                         await DisplayAlert("Uyarý", "Üye eklemek için yönetici olmalýsýn.", "Tamam");
                         return;
                     }
-                
+                }
+                else if (_mode == SelectPeopleMode.CreateGroup)
+                {
+                    groupName = GroupNameEntry.Text?.Trim();   // x:Name farklýysa burayý deðiþtir
+                    if (string.IsNullOrWhiteSpace(groupName))
+                    {
+                        await DisplayAlert("Uyarý", "Grup adý yazmalýsýn.", "Tamam");
+                        return;
+                    }
 
-                var newGroup = new Group { Name = groupName, CreatedByUserId = _currentUserId };
+                    var newGroup = new Group { Name = groupName, CreatedByUserId = _currentUserId };
                     context.Groups.Add(newGroup);
                     await context.SaveChangesAsync();
 
