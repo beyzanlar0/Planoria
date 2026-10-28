@@ -17,7 +17,7 @@
         <!-- Görev ekleme alanı -->
         <Frame Grid.Row="1" CornerRadius="24" Padding="6" BackgroundColor="White" 
                BorderColor="#F4C2D7" HasShadow="True" Margin="0,0,0,14">
-            <Grid ColumnDefinitions="*,Auto">
+            <Grid ColumnDefinitions="*,Auto,Auto">
                 <Entry Grid.Column="0" x:Name="NewTaskEntry" MaxLength="200"
                        Placeholder="Yeni görev ekle..." 
                        PlaceholderColor="#C99AAB"
@@ -25,7 +25,13 @@
                        BackgroundColor="Transparent"
                        VerticalOptions="Center"
                        Margin="12,0,0,0"/>
-                <Button Grid.Column="1" Text="➕" 
+                <DatePicker Grid.Column="1" x:Name="DueDatePicker"
+                            Format="dd.MM.yyyy"
+                            TextColor="#5A3A45"
+                            BackgroundColor="Transparent"
+                            VerticalOptions="Center"
+                            Margin="4,0,8,0"/>
+                <Button Grid.Column="2" Text="➕" 
                         Clicked="OnAddTaskClicked"
                         BackgroundColor="#F4A6C1"
                         TextColor="White"
@@ -75,9 +81,11 @@
                                 <CheckBox Grid.Column="0" IsChecked="{Binding IsCompleted}" 
                                           Color="#F4A6C1"
                                           CheckedChanged="OnTaskCheckedChanged"/>
-                                <Label Grid.Column="1" Text="{Binding Title}" 
-                                       VerticalOptions="Center" FontSize="15"
-                                       TextColor="#5A3A45"/>
+                                <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                                    <Label Text="{Binding Title}" FontSize="15" TextColor="#5A3A45"/>
+                                    <Label Text="{Binding DueDate, StringFormat='{0:dd.MM.yyyy}'}"
+                                           FontSize="11" TextColor="#C99AAB"/>
+                                </VerticalStackLayout>
                                 <Button Grid.Column="2" Text="🗑️" 
                                         Clicked="OnDeleteTaskClicked"
                                         BackgroundColor="Transparent"

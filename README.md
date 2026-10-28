@@ -17,7 +17,7 @@ Built to practice a real-world architecture: a **.NET MAUI** client talking to a
 
 ## Features
 
-**API (current branch `api-gecisi`)**
+**API**
 - Register / login with JWT
 - Personal tasks: list, get, create, update, delete, complete, reopen
 - Per-user ownership checks on every task endpoint
@@ -30,23 +30,26 @@ Built to practice a real-world architecture: a **.NET MAUI** client talking to a
 - Responsive layout (desktop and mobile)
 
 **MAUI app (still connects to the database directly, being migrated)**
-- Tasks with due dates and recurrence
+- Personal tasks with due dates and daily, weekly, monthly and yearly lists
 - Friends, friend requests and blocking
-- Group chats, direct messages, group tasks and invitations
+- Group chats, direct messages and invitations
+- Shared group tasks with a time limit, claimed by members and approved by the group leader
+- Group roles (owner, admin, member)
 - Profile with avatars
 
 ## Getting started (API)
+
+> **Note:** The .NET MAUI client needs a local `DbSecrets` file with a connection string that is not included in this repository, so `dotnet build` at the repository root fails without it. To try the project, run the API and its tests only, as described below.
 
 **Requirements**
 - [.NET 9 SDK](https://dotnet.microsoft.com/download)
 - SQL Server Express (default instance name `.\SQLEXPRESS`, Windows authentication)
 
-**1. Clone and switch to the API branch**
+**1. Clone the repository**
 
 ```powershell
 git clone https://github.com/beyzanlar0/Planoria.git
 cd Planoria
-git checkout api-gecisi
 ```
 
 **2. Set the JWT signing key** (stored in user-secrets, never committed)
@@ -129,6 +132,37 @@ Notes:
 - User-provided text is rendered with `textContent`, never `innerHTML`, to avoid XSS.
 - Ownership is enforced by the API; the browser never decides who owns a task.
 
+## MAUI app (Windows)
+
+The desktop client still talks to the database directly and is being migrated to the API.
+
+<p>
+  <img src="docs/maui-tasks.png" alt="Tasks with due date picker" width="420">
+  <img src="docs/maui-create-group.png" alt="Create a group" width="420">
+</p>
+<p>
+  <img src="docs/maui-group-chat.png" alt="Group chat" width="420">
+  <img src="docs/maui-group-roles.png" alt="Group roles" width="420">
+</p>
+<p>
+  <img src="docs/maui-shared-tasks.png" alt="Shared tasks with countdown" width="420">
+</p>
+
+<details>
+<summary>More screenshots</summary>
+
+<p>
+  <img src="docs/maui-friends.png" alt="Friends search" width="320">
+  <img src="docs/maui-requests.png" alt="Group invitations" width="320">
+  <img src="docs/maui-block-dialog.png" alt="Block confirmation" width="320">
+  <img src="docs/maui-blocked.png" alt="Blocked users" width="320">
+  <img src="docs/maui-profile.png" alt="Edit profile and avatars" width="320">
+  <img src="docs/maui-shared-tasks-claims.png" alt="Shared task claims awaiting approval" width="320">
+  <img src="docs/maui-shared-task-duration.png" alt="Choosing a task duration" width="320">
+</p>
+
+</details>
+
 ## Tests
 
 ```powershell
@@ -156,7 +190,7 @@ Integration tests start the API in memory with an in-memory database (no SQL Ser
 - Only the Windows target of the MAUI app currently builds; the Android build fails with an `Aapt2Link` error.
 - Data is not real-time; screens refresh on navigation.
 - The web client currently supports tasks only (no friends, groups or chat yet).
-- Due dates in the past are blocked in the web form, but not yet in the API.
+- Due dates in the past are blocked in the web form and the MAUI date picker, but not yet in the API.
 
 ## Roadmap
 
