@@ -5,6 +5,14 @@ Built to practice a real-world architecture: a **.NET MAUI** client talking to a
 
 > **Status:** work in progress. The API (auth + tasks) is complete and tested, and a small web client uses it; the MAUI app is being migrated from direct database access to the API. See [Known limitations](#known-limitations).
 
+## Overview
+
+Planoria started as a course project, and I kept developing it on my own into a full-stack application. Users can manage personal tasks (daily, weekly, monthly and yearly), share tasks with friends, create groups, and chat.
+
+The backend is an ASP.NET Core Web API (.NET 9) with JWT authentication, Entity Framework Core and SQL Server. Passwords are hashed with BCrypt, and the API is covered by xUnit integration tests. There are two clients: a web client built with plain HTML, CSS and JavaScript, and a .NET MAUI desktop app. The API, setup steps and security notes are documented below.
+
+**Next steps:** move friends, groups and chat to the API, switch the MAUI app from direct database access to the API, add real-time messaging with SignalR, and set up a CI pipeline. The full list is in the [Roadmap](#roadmap).
+
 ## Tech stack
 
 - .NET 9, C#
